@@ -1,0 +1,107 @@
+Started by an SCM change
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Debian in /home/workspace/Nginx
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Clone Repository)
+[Pipeline] git
+The recommended git tool is: NONE
+No credentials specified
+Fetching changes from the remote Git repository
+Checking out Revision 18ef6fee9bccc2e7dfb1f6afc12c845f240eaf96 (refs/remotes/origin/main)
+Commit message: "Update index.html"
+ > git rev-parse --resolve-git-dir /home/workspace/Nginx/.git # timeout=10
+ > git config remote.origin.url https://github.com/DjHelkern/SF_Jenkins.git # timeout=10
+Fetching upstream changes from https://github.com/DjHelkern/SF_Jenkins.git
+ > git --version # timeout=10
+ > git --version # 'git version 2.30.2'
+ > git fetch --tags --force --progress -- https://github.com/DjHelkern/SF_Jenkins.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+ > git rev-parse refs/remotes/origin/main^{commit} # timeout=10
+ > git config core.sparsecheckout # timeout=10
+ > git checkout -f 18ef6fee9bccc2e7dfb1f6afc12c845f240eaf96 # timeout=10
+ > git branch -a -v --no-abbrev # timeout=10
+ > git branch -D main # timeout=10
+ > git checkout -b main 18ef6fee9bccc2e7dfb1f6afc12c845f240eaf96 # timeout=10
+ > git rev-list --no-walk ac73c45f7884794ea5265f41f9f7836e6ceefe07 # timeout=10
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Container)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] isUnix
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] sh
++ docker build -t nginx -f Dockerfile .
+#1 [internal] load .dockerignore
+#1 transferring context: 2B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 308B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/nginx:latest
+#3 DONE 0.0s
+
+#4 [internal] load build context
+#4 transferring context: 3.28kB done
+#4 DONE 0.0s
+
+#5 [1/2] FROM docker.io/library/nginx
+#5 CACHED
+
+#6 [2/2] COPY index.html /usr/share/nginx/html/index.html
+#6 DONE 0.0s
+
+#7 exporting to image
+#7 exporting layers 0.0s done
+#7 writing image sha256:9fa08607e1a0d894dbf0a8b9b8c38484fbd2644a6451d5c55f4f16b7ec1f0550 done
+#7 naming to docker.io/library/nginx done
+#7 DONE 0.0s
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Run Container)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ docker ps -aq --filter name=nginx
+[Pipeline] sh
++ docker run -d -p 9889:80 --name nginx nginx
+[Pipeline] sh
++ sleep 10
+[Pipeline] sh
++ curl -o /dev/null -s -w %{http_code} http://localhost:9889/
+[Pipeline] sh
++ md5sum index.html
+[Pipeline] sh
++ curl -s http://localhost:9889/
++ md5sum
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ docker ps -a -q --filter name=nginx
+[Pipeline] sh
++ docker rm -f 45c8be3ca99c
+45c8be3ca99c
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
